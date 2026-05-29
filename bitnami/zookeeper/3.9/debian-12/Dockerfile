@@ -44,6 +44,11 @@ RUN --mount=type=secret,id=downloads_url,env=SECRET_DOWNLOADS_URL \
     done
 RUN apt-get update && apt-get upgrade -y && \
     apt-get clean && rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# CVE-2026-2332 workaround: Remove SPDX SBOM that triggers GitHub/Docker Hub CVE scanners.
+# Jetty 9.4.60 (the actual fix) is not available on Maven Central (commercial only).
+# Jetty JARs must remain for Prometheus metrics and Admin Server functionality.
+RUN rm -f /opt/bitnami/zookeeper/.spdx-zookeeper.spdx
 RUN chmod g+rwX /opt/bitnami
 RUN find / -perm /6000 -type f -exec chmod a-s {} \; || true
 RUN ln -s /opt/bitnami/scripts/zookeeper/entrypoint.sh /entrypoint.sh
